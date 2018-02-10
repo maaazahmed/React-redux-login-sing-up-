@@ -1,0 +1,16 @@
+.create_quiz_div{
+    /* border: solid 1px #000000; */
+    width: 40%;
+    padding: 20px;
+    margin: 0 auto;  
+}
+
+h2{
+    /* margin: 0 auto;  */
+    text-align: center;
+    margin-bottom: 30px;
+}
+textarea{
+    max-height: 130px;
+    min-height: 130px
+}

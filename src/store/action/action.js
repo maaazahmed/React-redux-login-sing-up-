@@ -67,3 +67,40 @@ export const log_in_Action = (user)=>{
         });
       }
 }
+
+export const quizAction = (some)=>{
+    return dispatch => {
+      dispatch({
+           type:ActionTypes.NEXT_QUIZ,
+           payload:some
+       })
+      }
+}
+export const scoreAction = (score)=>{
+    // alert("as")
+    return dispatch => {
+      dispatch({
+           type:ActionTypes.SCORE,
+           type:score 
+         })
+      }
+}
+
+
+export const addQuizAction = (some)=>{
+    return dispatch => {
+      dispatch({
+           type:ActionTypes.QUIZ_DATA,
+           payload:some
+       })
+      }
+}
+export const correctQuizAction = (some)=>{
+    // console.log(some)
+    return dispatch => {
+      dispatch({
+           type:ActionTypes.CORRECT_ANS,
+           payload:some
+       })
+      }
+}

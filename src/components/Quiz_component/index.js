@@ -6,6 +6,7 @@ import {connect} from 'react-redux'
 // import SignUp from "./singUp"
 // import { log_in_Action } from "../../store/action/action"
 import QuizComponent from "./Quiz"
+import NaveComponent from "./navebar"
 
 
 
@@ -15,6 +16,7 @@ class MainComponent extends Component {
   render() {
     return (
      <div> 
+       {/* <NaveComponent /> */}
        <QuizComponent />
       </div>     
       

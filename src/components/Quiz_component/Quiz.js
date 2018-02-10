@@ -1,11 +1,22 @@
 import React, { Component } from 'react';
+import { connect } from "react-redux"
+import {
+   quizAction,
+   scoreAction,
+   addQuizAction,
+   correctQuizAction } from "../../store/action/action"
+import firebase from 'firebase'
+import history from '../../History'
 
+let database = firebase.database().ref("/")
 class QuizComponent extends Component {
 
   constructor(){
     super()
     this.radioHandler = this.radioHandler.bind(this)
     this.nextButon = this.nextButon.bind(this)
+    this.startQuiz = this.startQuiz.bind(this)
+    this.endButon = this.endButon.bind(this)
     this.state = {
       radioGroup:{
         Option_1:false,
@@ -14,14 +25,22 @@ class QuizComponent extends Component {
         Option_4:false,
       },
       radioGroupValue:"",
-      // qusAndOptionArr:[
-      //   {Ques:"What is your name", Option1:"Maaz Ahmed" ,Option2:"Aslam Khan",Option3:"Aalam Khan",Option4:"Afzaal Khan"},
-      //   {Ques:"What is your father's name", Option1:"Sabir Ali" ,Option2:"Nazir Ali",Option3:"Saleem Ahmed",Option4:"Mushtaq Ahmed"},
-      //   {Ques:"Where are you live", Option1:"Karachi" ,Option2:"Haiderabad",Option3:"Islamabad",Option4:"Lahore"},
-      // ],
-      // correctAns:["Maaz Ahmed","Sabir Ali","Karachi"]
+      falge:false
     }
     
+  }
+
+  componentWillMount(){
+    database.child("Quiz/quiz-que-option").on("child_added",(snapsht)=>{
+      let obj = snapsht.val()
+      obj.id = snapsht.key;
+     this.props.addQuiz(obj)
+    })
+    database.child("Quiz/correct").on("child_added",(snapsht)=>{
+      let obj_2 = snapsht.val()
+      obj_2.id = snapsht.key;
+     this.props.correctQuizAction(obj_2)
+    })
   }
   
   radioHandler(ev){
@@ -29,44 +48,120 @@ class QuizComponent extends Component {
      for(var key in radioGroup){
        radioGroup[key] = false
      }
-     radioGroup[ev.target.value] = ev.target.checked
-    this.setState({
-      radioGroupValue : ev.target.value
+     radioGroup[ev.target.checked] = ev.target.checked
+        this.setState({
+      radioGroupValue : ev.target.value,
     })
+    
   }
-
 
   nextButon(){ 
-      // console.log(this.state.radioGroupValue)
+      let allCorrectAns = this.props.root.correctAns
+
+      this.props.quiz_chack(1)
+      for(var i = 0; i < allCorrectAns.length;i++){
+        if(allCorrectAns[i].correctAns === this.state.radioGroupValue){
+          console.log(allCorrectAns[i].correctAns ,"===", this.state.radioGroupValue)
+          this.props.score_chack(1)
+        }
+      }
   }
 
+  endButon(){
+    history.push("/result")
+  }
+
+ 
+  startQuiz(){
+    this.setState({
+      falge:true,
+    })
+  }
 
   render() {
     return (
      <div> 
-         <h3></h3>
+       {(this.state.falge === true)?
+       <div>
+         <h3>{this.props.root.qusAndOptionArr[this.props.root.counter].Question}</h3>
         <div className="radio">
-          <label><input type="radio" name="option" value="Option 1" checked={this.state.radioGroup.Option_1['Option 1']}
-          onChange={this.radioHandler} />Option 1</label>
+          <label>
+            <input type="radio" name="option"
+              value={this.props.root.qusAndOptionArr[this.props.root.counter].Option1} 
+              checked={this.state.radioGroup.Option_1[this.props.root.qusAndOptionArr[this.props.root.counter].Option1]}
+               onChange={this.radioHandler} />
+               {this.props.root.qusAndOptionArr[this.props.root.counter].Option1}
+           </label>
          </div>
          <div className="radio">
-           <label><input type="radio" name="option" value="Option 2" checked={this.state.radioGroup.Option_2['Option 2']}
-           onChange={this.radioHandler} />Option 2</label>
+          <label>
+            <input type="radio" name="option"
+              value={this.props.root.qusAndOptionArr[this.props.root.counter].Option2} 
+              checked={this.state.radioGroup.Option_2[this.props.root.qusAndOptionArr[this.props.root.counter].Option_2]}
+               onChange={this.radioHandler} />
+               {this.props.root.qusAndOptionArr[this.props.root.counter].Option2}
+           </label>
          </div>
-         <div className="radio disabled">
-           <label><input type="radio" name="option" value="Option 3" checked={this.state.radioGroup.Option_3['Option 3']}
-            onChange={this.radioHandler} />Option 3</label>
+         <div className="radio">
+          <label>
+            <input type="radio" name="option"
+              value={this.props.root.qusAndOptionArr[this.props.root.counter].Option3} 
+              checked={this.state.radioGroup.Option_3[this.props.root.qusAndOptionArr[this.props.root.counter].Option3]}
+               onChange={this.radioHandler} />
+               {this.props.root.qusAndOptionArr[this.props.root.counter].Option3}
+           </label>
          </div>
-         <div className="radio disabled">
-           <label><input type="radio" name="option" value="Option 4" checked={this.state.radioGroup.Option_4['Option 4']} 
-           onChange={this.radioHandler} />Option 3</label>
+         <div className="radio">
+          <label>
+            <input type="radio" name="option"
+              value={this.props.root.qusAndOptionArr[this.props.root.counter].Option4} 
+              checked={this.state.radioGroup.Option_4[this.props.root.qusAndOptionArr[this.props.root.counter].Option4]}
+               onChange={this.radioHandler} />
+               {this.props.root.qusAndOptionArr[this.props.root.counter].Option4}
+           </label>
          </div>
-         <button onClick={this.nextButon} type="button" className="btn btn-primary">Next</button>
+           {(this.props.root.counter + 1 !==  this.props.root.qusAndOptionArr.length)?
+           
+           <div>
+             <button onClick={this.nextButon} type="button" className="btn btn-primary">Next</button>
+          </div>
+           : 
+           <div>
+             <button onClick={this.endButon} type="button" className="btn btn-primary">End</button>
+           </div>
+          }
+
+         </div>
+       
+        :
+          <div>
+             <h1>Start Quiz</h1>
+            <button onClick={this.startQuiz} type="button" className="btn btn-primary">Start</button>
+         </div>
+       }
+
       </div>     
     );
   }
 }
 
+const mapStateToProps = (state) =>{
+  return({
+     root:state.root
+  })
+}
+const mapDispatchToProps = (dispatch) =>{
+  return({
+      quiz_chack:(num)=>{dispatch(quizAction(num))},
 
-export default (QuizComponent);
+      score_chack:(num)=>{ dispatch(scoreAction(num))},
+      addQuiz:(data)=>{ dispatch(addQuizAction(data))},
+      correctQuizAction:(data)=>{
+        dispatch(correctQuizAction(data))
+      }
+  })
+}
+
+
+export default connect(mapStateToProps,mapDispatchToProps) (QuizComponent);
 
